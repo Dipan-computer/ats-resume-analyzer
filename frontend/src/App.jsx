@@ -216,7 +216,7 @@ export default function App() {
               >
                 <span style={styles.statusDot} />
                 {backendStatus === "online"
-                  ? "Backend Online"
+                  ? "Project Online"
                   : backendStatus === "offline"
                   ? "Backend Offline"
                   : "Checking Backend"}
