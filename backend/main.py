@@ -1,4 +1,4 @@
-from io import BytesIO
+ from io import BytesIO
 import pdfplumber
 from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
