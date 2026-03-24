@@ -200,7 +200,7 @@ export default function App() {
                 <div style={styles.logoBadge}>AI</div>
                 <div>
                   <div style={styles.logoTitle}>ATS Resume Analyzer</div>
-                  <div style={styles.logoSub}>React + FastAPI Project</div>
+                 
                 </div>
               </div>
 
