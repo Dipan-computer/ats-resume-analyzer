@@ -1,5 +1,4 @@
 from io import BytesIO
-
 import pdfplumber
 from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
@@ -9,6 +8,7 @@ app = FastAPI()
 origins = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
+    "https://ats-checker-dipan.netlify.app",
 ]
 
 app.add_middleware(
@@ -31,7 +31,7 @@ def health():
 async def upload_resume(file: UploadFile = File(...)):
     try:
         if not file.filename:
-            return {"error": "No file selected", "filename": "", "text": ""}
+            return {"error": "No file selected", "filename": "", "text": "", "is_resume": False}
 
         if not file.filename.lower().endswith(".pdf"):
             return {
@@ -84,7 +84,6 @@ async def upload_resume(file: UploadFile = File(...)):
             "text": "",
             "is_resume": False,
         }
-
 
 def check_if_resume(text, filename=""):
     lower_text = text.lower()

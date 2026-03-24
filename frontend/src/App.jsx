@@ -41,7 +41,7 @@ export default function App() {
   const fileInputRef = useRef(null);
 
   useEffect(() => {
-    fetch("http://127.0.0.1:8000/health")
+    fetch(" https://ats-resume-analyzer-1-t2kq.onrender.com/")
       .then((res) => {
         if (!res.ok) throw new Error("Backend offline");
         return res.json();
@@ -108,7 +108,7 @@ export default function App() {
         const formData = new FormData();
         formData.append("file", resumeFile);
 
-        const response = await fetch("http://127.0.0.1:8000/upload", {
+        const response = await fetch("https://ats-resume-analyzer-1-t2kq.onrender.com//upload", {
           method: "POST",
           body: formData,
         });
