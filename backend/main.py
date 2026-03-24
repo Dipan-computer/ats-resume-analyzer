@@ -1,89 +1,43 @@
- from io import BytesIO
-import pdfplumber
-from fastapi import FastAPI, File, UploadFile
-from fastapi.middleware.cors import CORSMiddleware
+ const handleAnalyze = async () => {
+  if (!resumeFile) {
+    setError("Please upload a PDF resume first.");
+    return;
+  }
 
-app = FastAPI()
+  setError(null);
+  setResult(null);
+  setResumeText("");
+  setIsLoading(true);
 
-origins = [
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
-    "https://ats-checker-dipan.netlify.app",
-]
+  try {
+    const formData = new FormData();
+    formData.append("file", resumeFile);
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+    const response = await fetch("https://ats-resume-analyzer-1-t2kq.onrender.com/upload", {
+      method: "POST",
+      body: formData,
+    });
 
-@app.get("/")
-def home():
-    return {"message": "Backend is running successfully"}
+    const data = await response.json();
+    console.log("UPLOAD RESPONSE:", data);
 
-@app.get("/health")
-def health():
-    return {"status": "ok"}
+    if (!response.ok) {
+      throw new Error(data?.error || "Upload failed");
+    }
 
-@app.post("/upload")
-async def upload_resume(file: UploadFile = File(...)):
-    try:
-        if not file.filename:
-            return {
-                "error": "No file selected",
-                "filename": "",
-                "text": "",
-                "is_resume": False,
-            }
+    if (data.error) {
+      throw new Error(data.error);
+    }
 
-        if not file.filename.lower().endswith(".pdf"):
-            return {
-                "error": "Only PDF files are supported right now",
-                "filename": file.filename,
-                "text": "",
-                "is_resume": False,
-            }
+    if (data.is_resume === false) {
+      throw new Error("This PDF does not look like a resume or CV.");
+    }
 
-        file_bytes = await file.read()
-
-        if not file_bytes:
-            return {
-                "error": "Uploaded file is empty",
-                "filename": file.filename,
-                "text": "",
-                "is_resume": False,
-            }
-
-        extracted_text = ""
-        with pdfplumber.open(BytesIO(file_bytes)) as pdf:
-            for page in pdf.pages:
-                page_text = page.extract_text()
-                if page_text:
-                    extracted_text += page_text + "\n"
-
-        extracted_text = extracted_text.strip()
-
-        if not extracted_text:
-            return {
-                "error": "Text could not be extracted from this PDF. Try another resume PDF.",
-                "filename": file.filename,
-                "text": "",
-                "is_resume": False,
-            }
-
-        return {
-            "filename": file.filename,
-            "text": extracted_text,
-            "is_resume": True,
-        }
-
-    except Exception as e:
-        print("UPLOAD ERROR:", str(e))
-        return {
-            "error": f"Failed to process PDF: {str(e)}",
-            "filename": file.filename if file.filename else "",
-            "text": "",
-            "is_resume": False,
-        }
+    setResumeText(data.text || "");
+  } catch (err) {
+    console.error("UPLOAD ERROR:", err);
+    setError(err.message || "Failed to analyze resume.");
+  } finally {
+    setIsLoading(false);
+  }
+};
