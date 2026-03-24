@@ -1,11 +1,12 @@
  const handleAnalyze = async () => {
   if (!file) {
-    alert("Please upload a file first");
+    alert("Please select a file first");
     return;
   }
 
   try {
     setLoading(true);
+    setError("");
 
     const formData = new FormData();
     formData.append("file", file); // ⚠️ MUST be "file"
@@ -20,7 +21,7 @@
 
     const data = await response.json();
 
-    console.log("RESPONSE:", data);
+    console.log("SERVER RESPONSE:", data);
 
     if (!response.ok) {
       throw new Error(data.error || "Upload failed");
@@ -34,7 +35,7 @@
 
   } catch (err) {
     console.error("UPLOAD ERROR:", err);
-    alert(err.message);
+    setError(err.message || "Failed to upload resume");
   } finally {
     setLoading(false);
   }
